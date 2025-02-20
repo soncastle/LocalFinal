@@ -62,7 +62,6 @@
 	<thead>
 	<tr>
 		<th>상품명</th>
-		<th>주문번호</th>
 		<th>수량</th>
 		<th>가격</th>
 	</tr>
@@ -70,7 +69,6 @@
 	<tbody>
 	<tr th:each="item : ${item}">
 		<td th:text="${item.productName}"></td>
-		<td th:text="${item.purchaseId.purchaseId}"></td>
 		<td th:text="${item.quantity}"></td>
 		<td th:text="${item.totalPrice}"></td>
 	</tr>

@@ -3,7 +3,8 @@ package com.shoppingmall.order.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -28,6 +29,11 @@ public class PurchaseItem {
     private int quantity; // 수량
     
     private int price; // 가격
+
+//    @Column(nullable = false, updatable = false)
+    private LocalDateTime createAt; // 주문 생성 시간
+
+    private LocalDateTime cancelAt; // 주문 취소 시간
 
     private int totalPrice; // 해당 상품 총 가격
 }

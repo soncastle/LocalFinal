@@ -5,10 +5,12 @@ import com.shoppingmall.order.domain.PurchaseItem;
 import com.shoppingmall.order.domain.PurchaseList;
 import com.shoppingmall.order.dto.PurchaseAllDto;
 import com.shoppingmall.order.dto.PurchaseItemDto;
+import com.shoppingmall.order.dto.PurchaseListDto;
 import com.shoppingmall.order.repository.PurchaseDeliveryRepository;
 import com.shoppingmall.order.repository.PurchaseItemRepository;
 import com.shoppingmall.order.repository.PurchaseListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,7 +34,10 @@ public class PurchaseAllService {
 	public String order(PurchaseList purchase, PurchaseDelivery delivery, PurchaseItem item, String receiveDetailAddr) {
 
 		purchase.setCreateAt(LocalDateTime.now());
+		item.setCreateAt(LocalDateTime.now());
+		System.out.println("CreateAt before save: " + purchase.getCreateAt());
 		purRepo.save(purchase);
+		itemRepo.save(item);
 		delivery.setReceiverAddr(delivery.getReceiverAddr() + " " + receiveDetailAddr);
 		delivery.setPurchaseId(purchase);
 		delivery.setDeliveryStatus("배송준비중");
@@ -42,6 +47,19 @@ public class PurchaseAllService {
 		itemRepo.save(item);
 
 		return "주문해주셔서 감사합니다";
+	}
+
+	public PurchaseAllDto allList(){
+		List<PurchaseList> purchases = purRepo.findAll(Sort.by(Sort.Direction.DESC, "purchaseId"));
+		List<PurchaseDelivery> deliveries = delRepo.findAllOrderByPurchaseIdDesc();
+		List<PurchaseItem> items =itemRepo.findAllOrderByPurchaseIdDesc();
+
+		return PurchaseAllDto.builder()
+				.purchaseList(purchases)
+				.purchaseDelivery(deliveries)
+				.purchaseItem(items)
+				.build();
+
 	}
 	
 	public PurchaseAllDto getOrderDetails(Long purchaseId) {
@@ -66,26 +84,32 @@ public class PurchaseAllService {
 		if (items.isEmpty()) {
 			throw new RuntimeException("Item not found for id: " + purchaseId);
 		}
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//			String formattedDate = purchase.getCreateAt().format(formatter);
 // 날짜 포맷팅
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String formattedDate = purchase.getCreateAt().format(formatter);
-
-
-				return PurchaseAllDto.builder()
-				.purchaseList(purchases)  // 전체 PurchaseList 리스트
-				.purchaseDelivery(deliveries)  // 전체 PurchaseDelivery 리스트
-				.purchaseItem(items)  // 전체 PurchaseItem 리스트
-				.formattedCreateAt(formattedDate)  // 포맷팅된 날짜
-				.build();
-
+			return PurchaseAllDto.builder()
+					.purchaseList(purchases)  // 전체 PurchaseList 리스트
+					.purchaseDelivery(deliveries)  // 전체 PurchaseDelivery 리스트
+					.purchaseItem(items)  // 전체 PurchaseItem 리스트
+//					.formattedCreateAt(formattedDate)  // 포맷팅된 날짜
+					.build();
 	}
 
-//		public PurchaseItemDto orderDetail(Long productId){
-//			Optional<PurchaseItem> orderProductOne = itemRepo.findById(productId);
-//
-//
-//
-//
-//	}
+		public PurchaseItemDto orderDetail(Long purchaseItemId){
+			Optional<PurchaseItem> purchaseItem = itemRepo.findById(purchaseItemId);
 
+			PurchaseItem item = purchaseItem.get();
+
+			return PurchaseItemDto.builder()
+					.orderItemId(item.getPurchaseItemId())
+					.productId(item.getProductId())
+					.productName(item.getProductName())
+					.option(item.getOption())
+					.quantity(item.getQuantity())
+					.price(item.getPrice())
+					.totalPrice(item.getTotalPrice())
+					.createAt(item.getCreateAt())
+					.cancelAt(item.getCancelAt())
+					.build();
+	}
 }

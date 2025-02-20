@@ -54,16 +54,26 @@ public String order(@ModelAttribute PurchaseList purchase, @ModelAttribute Purch
 	model.addAttribute("delivery", purchaseAllDto.getPurchaseDelivery());
 	model.addAttribute("purchase", purchaseAllDto.getPurchaseList());
 	model.addAttribute("item", purchaseAllDto.getPurchaseItem());
-	model.addAttribute("orderTime", purchaseAllDto);
+//	model.addAttribute("orderTime", purchaseAllDto);
 
 	return "order2/orderResult";
 }
 
-	@PostMapping("/admin")
-	public String orderDetail(@RequestParam("UserId") String userId,
-							  @RequestParam("ProductId") Long productId,
-							  Model model){
-		 service.orderDetail(productId);
-		return "order/orderResultAll";
-}
+@PostMapping("/admin/orderList")
+public String orderAll(Model model){
+		model.addAttribute("purchase", service.allList().getPurchaseList());
+		model.addAttribute("delivery", service.allList().getPurchaseDelivery());
+		model.addAttribute("item", service.allList().getPurchaseItem());
+	return "order2/orderResultAll";
+	}
+
+//	@PostMapping("/order/{}")
+//	public String orderDetail(@RequestParam("PurchaseItemId") Long purchaseItemId,
+//							  Model model){
+//		System.out.println(purchaseItemId);
+//		model.addAttribute("item", service.orderDetail(purchaseItemId));
+//		System.out.println(service.orderDetail(purchaseItemId).getProductName());
+//		return "order/index";
+//
+//}
 }
