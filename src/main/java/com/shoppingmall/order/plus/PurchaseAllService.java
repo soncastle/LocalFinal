@@ -35,7 +35,6 @@ public class PurchaseAllService {
 
 		purchase.setCreateAt(LocalDateTime.now());
 		item.setCreateAt(LocalDateTime.now());
-		System.out.println("CreateAt before save: " + purchase.getCreateAt());
 		purRepo.save(purchase);
 		itemRepo.save(item);
 		delivery.setReceiverAddr(delivery.getReceiverAddr() + " " + receiveDetailAddr);
@@ -111,5 +110,23 @@ public class PurchaseAllService {
 					.createAt(item.getCreateAt())
 					.cancelAt(item.getCancelAt())
 					.build();
+	}
+
+	public String deliveryChange(String deliveryState, Long purchaseId){
+		 PurchaseDelivery changeState = delRepo.findPurchaseDeliveryByPurchaseId(purchaseId);
+		System.out.println(deliveryState);
+		System.out.println(purchaseId);
+		if(deliveryState.equals("onDelivery")){
+			deliveryState = "배송중";
+		}
+		else if(deliveryState.equals("onDelivery")){
+			deliveryState = "배송완료";
+		}
+		else{
+			deliveryState = "배송취소";
+		}
+			changeState.setDeliveryStatus(deliveryState);
+			delRepo.save(changeState);
+		return "주문상태 변경: " + deliveryState;
 	}
 }

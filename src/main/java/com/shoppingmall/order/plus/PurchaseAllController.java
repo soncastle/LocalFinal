@@ -67,6 +67,15 @@ public String orderAll(Model model){
 	return "order2/orderResultAll";
 	}
 
+	@GetMapping("/order/{purchaseId}")
+	public String orderDetail(@PathVariable Long purchaseId, Model model){
+	System.out.println(purchaseId);
+	PurchaseAllDto purchaseAllDto = service.getOrderDetails(purchaseId);
+		model.addAttribute("delivery", purchaseAllDto.getPurchaseDelivery());
+		model.addAttribute("purchase", purchaseAllDto.getPurchaseList());
+		model.addAttribute("item", purchaseAllDto.getPurchaseItem());
+		return "order2/orderResult";
+	}
 //	@PostMapping("/order/{}")
 //	public String orderDetail(@RequestParam("PurchaseItemId") Long purchaseItemId,
 //							  Model model){
@@ -76,4 +85,12 @@ public String orderAll(Model model){
 //		return "order/index";
 //
 //}
+
+	@PostMapping("/admin/deiveryChange")
+	public String deliveryChange(@RequestParam("deliveryState")String deliveryState,
+								 @RequestParam("purchaseId")Long purchaseId,
+										 Model model){
+	model.addAttribute("message",service.deliveryChange(deliveryState, purchaseId));
+	return "order2/index";
+	}
 }
