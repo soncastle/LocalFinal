@@ -1,12 +1,13 @@
-package com.shoppingmall.order.plus;
+package com.shoppingmall.order.controller;
 
 import com.shoppingmall.order.domain.PurchaseDelivery;
 import com.shoppingmall.order.domain.PurchaseItem;
-import com.shoppingmall.order.domain.PurchaseList;
+import com.shoppingmall.order.domain.Purchase;
 import com.shoppingmall.order.dto.PurchaseAllDto;
 import com.shoppingmall.order.repository.PurchaseDeliveryRepository;
 import com.shoppingmall.order.repository.PurchaseItemRepository;
 import com.shoppingmall.order.repository.PurchaseListRepository;
+import com.shoppingmall.order.service.PurchaseAllService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/order")
 @Controller
-public class PurchaseAllController {
+public class PurchaseController {
 
 @GetMapping("/index")
 public String index() {
@@ -42,14 +43,14 @@ PurchaseItemRepository itemRepo;
 PurchaseAllService service;
 
 @GetMapping("/order")
-public String order(@ModelAttribute PurchaseList purchase, @ModelAttribute PurchaseDelivery delivery,
-					@ModelAttribute PurchaseItem item,
-					@RequestParam(name = "receiver_addr_detail") String receiveDetailAddr,
-					Model model){
+public String order(@ModelAttribute Purchase purchase, @ModelAttribute PurchaseDelivery delivery,
+										@ModelAttribute PurchaseItem item,
+										@RequestParam(name = "receiver_addr_detail") String receiveDetailAddr,
+										Model model){
 	model.addAttribute("message", service.order(purchase, delivery, item, receiveDetailAddr));
 	PurchaseAllDto purchaseAllDto = service.getOrderDetails(purchase.getPurchaseId());
 	model.addAttribute("delivery", purchaseAllDto.getPurchaseDelivery());
-	model.addAttribute("purchase", purchaseAllDto.getPurchaseList());
+	model.addAttribute("purchase", purchaseAllDto.getPurchase());
 	model.addAttribute("item", purchaseAllDto.getPurchaseItem());
 //	model.addAttribute("orderTime", purchaseAllDto);
 
@@ -58,7 +59,7 @@ public String order(@ModelAttribute PurchaseList purchase, @ModelAttribute Purch
 
 @PostMapping("/admin/orderList")
 public String orderAll(Model model){
-		model.addAttribute("purchase", service.allList().getPurchaseList());
+		model.addAttribute("purchase", service.allList().getPurchase());
 		model.addAttribute("delivery", service.allList().getPurchaseDelivery());
 		model.addAttribute("item", service.allList().getPurchaseItem());
 	return "order/orderResultAll";
@@ -69,7 +70,7 @@ public String orderAll(Model model){
 	System.out.println(purchaseId);
 	PurchaseAllDto purchaseAllDto = service.getOrderDetails(purchaseId);
 		model.addAttribute("delivery", purchaseAllDto.getPurchaseDelivery());
-		model.addAttribute("purchase", purchaseAllDto.getPurchaseList());
+		model.addAttribute("purchase", purchaseAllDto.getPurchase());
 		model.addAttribute("item", purchaseAllDto.getPurchaseItem());
 		return "order/orderResult";
 	}

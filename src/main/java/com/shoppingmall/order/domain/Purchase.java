@@ -7,10 +7,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class PurchaseList {
+public class Purchase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "purchase_id")
     private Long purchaseId; // 주문 ID (PK)
 
     private Long cartId; // 장바구니 ID (FK), 단순한 Long 타입 필드

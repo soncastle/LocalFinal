@@ -1,11 +1,10 @@
-package com.shoppingmall.order.plus;
+package com.shoppingmall.order.service;
 
 import com.shoppingmall.order.domain.PurchaseDelivery;
 import com.shoppingmall.order.domain.PurchaseItem;
-import com.shoppingmall.order.domain.PurchaseList;
+import com.shoppingmall.order.domain.Purchase;
 import com.shoppingmall.order.dto.PurchaseAllDto;
 import com.shoppingmall.order.dto.PurchaseItemDto;
-import com.shoppingmall.order.dto.PurchaseListDto;
 import com.shoppingmall.order.repository.PurchaseDeliveryRepository;
 import com.shoppingmall.order.repository.PurchaseItemRepository;
 import com.shoppingmall.order.repository.PurchaseListRepository;
@@ -14,10 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 
@@ -31,7 +28,7 @@ public class PurchaseAllService {
 	@Autowired
 	PurchaseItemRepository itemRepo;
 
-	public String order(PurchaseList purchase, PurchaseDelivery delivery, PurchaseItem item, String receiveDetailAddr) {
+	public String order(Purchase purchase, PurchaseDelivery delivery, PurchaseItem item, String receiveDetailAddr) {
 
 		purchase.setCreateAt(LocalDateTime.now());
 		item.setCreateAt(LocalDateTime.now());
@@ -49,12 +46,12 @@ public class PurchaseAllService {
 	}
 
 	public PurchaseAllDto allList(){
-		List<PurchaseList> purchases = purRepo.findAll(Sort.by(Sort.Direction.DESC, "purchaseId"));
+		List<Purchase> purchases = purRepo.findAll(Sort.by(Sort.Direction.DESC, "purchaseId"));
 		List<PurchaseDelivery> deliveries = delRepo.findAllOrderByPurchaseIdDesc();
 		List<PurchaseItem> items =itemRepo.findAllOrderByPurchaseIdDesc();
 
 		return PurchaseAllDto.builder()
-				.purchaseList(purchases)
+				.purchase(purchases)
 				.purchaseDelivery(deliveries)
 				.purchaseItem(items)
 				.build();
@@ -63,13 +60,13 @@ public class PurchaseAllService {
 	
 	public PurchaseAllDto getOrderDetails(Long purchaseId) {
 		// Purchase 정보 가져오기
-		List<PurchaseList> purchases = new ArrayList<>();
+		List<Purchase> purchases = new ArrayList<>();
 		List<PurchaseDelivery> deliveries = new ArrayList<>();
 		List<PurchaseItem> items = new ArrayList<>();
 
 
 //		if(purchaseId!=null){
-		PurchaseList purchase = purRepo.findById(purchaseId)
+		Purchase purchase = purRepo.findById(purchaseId)
 				.orElseThrow(() -> new RuntimeException("Purchase not found for id: " + purchaseId));
 		purchases = purRepo.findByPurchaseId(purchaseId);
 		if (purchases.isEmpty()) {
@@ -87,7 +84,7 @@ public class PurchaseAllService {
 //			String formattedDate = purchase.getCreateAt().format(formatter);
 // 날짜 포맷팅
 			return PurchaseAllDto.builder()
-					.purchaseList(purchases)  // 전체 PurchaseList 리스트
+					.purchase(purchases)  // 전체 PurchaseList 리스트
 					.purchaseDelivery(deliveries)  // 전체 PurchaseDelivery 리스트
 					.purchaseItem(items)  // 전체 PurchaseItem 리스트
 //					.formattedCreateAt(formattedDate)  // 포맷팅된 날짜
